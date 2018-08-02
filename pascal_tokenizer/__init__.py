@@ -15,7 +15,7 @@ def is_comment(s):
     if type(s) is list:
         return True
     else:
-        return (s[0]=='{' and s[-1]=='}') or (s[:2]=='(*' and s[-2:]=='*)') or s[:2]=='//'
+        return s.startswith('{') or s.startswith('(*') or s.startswith('//')
 
 def is_name(s):
     if not (s[0] in CHARS_ID0):
@@ -175,9 +175,10 @@ class PasTokenizerStack():
         return self.main.get_next()
 
     def _get_without_comments(self):
-        s=(0,'//')
+        s = (0,'//')
         while is_comment(s[1]):
-            s = self.main.
+            s = self.main.get_next()
+        return s
 
     def push(self, s):
         self.stack.append(s)
