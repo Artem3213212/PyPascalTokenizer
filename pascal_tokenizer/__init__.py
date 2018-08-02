@@ -12,7 +12,10 @@ CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
 CHARS_ID = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
 
 def is_comment(s):
-    return (s[0]=='{' and s[-1]=='}') or (s[:2]=='(*' and s[-2:]=='*)') or s[:2]=='//'
+    if type(s) is list:
+        return True
+    else:
+        return (s[0]=='{' and s[-1]=='}') or (s[:2]=='(*' and s[-2:]=='*)') or s[:2]=='//'
 
 def is_name(s):
     if not (s[0] in CHARS_ID0):
@@ -193,3 +196,6 @@ class PasTokenizerStack():
     def is_ended(self):
         return self.stack or self.main.is_ended()
 
+class PasTokenizerParallelStack(PasTokenizerStack):
+    def __init__(self,s,comments=True):
+        

@@ -11,7 +11,7 @@ Token format:
 
 It is tuple with 4 elements:
 
-* token - string with token text
+* token - string with token text (comments can be list of string)
 
 * begin - tuple with line and symbol (start from 0) where token begin(first symbol)
 
@@ -20,7 +20,10 @@ symbol num = line len)
 
 * ended - True if it was last token
 
-Class PasTokenizer has constructor, which needs param: list of source code lines. It has methods:
+PasTokenizer
+------------
+
+Class PasTokenizer has constructor. Methods:
 
 * __init__(s) - Create class, get list of strings what was tokenized
 
@@ -29,6 +32,9 @@ Class PasTokenizer has constructor, which needs param: list of source code lines
 * read_next() - get next token, but not save end pos
 
 * is_ended() - check if text ended
+
+PasTokenizerStack
+-----------------
 
 Class PasTokenizerStack has constructor, which needs param: list of source code lines. It has methods:
 
@@ -42,7 +48,21 @@ Class PasTokenizerStack has constructor, which needs param: list of source code 
 
 * is_ended() - check if stack ended
 
+PasTokenizerParallelStack
+-------------------------
 
+Parrallel version of PasTokenizerStack.
+
+Utils
+-----
+
+Some functions to analise tokens.
+
+* is_comment(s) Check token's text. True if comment.
+
+* is_name(s) Check token's text. True if it can be name (Not check reserved words).
+
+* is_string(s) Check token's text. True if string.
 
 
 Author
