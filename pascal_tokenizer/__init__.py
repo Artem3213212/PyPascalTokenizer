@@ -71,15 +71,15 @@ class PasTokenizer():
         while self.s[self.x][self.y] in SPACES:
             self._next_readable_()
 
-    def _getpos_(self):
+    def _get_pos_(self):
         return self.x, self.y
 
-    def _setpos_(self, i0, i1):
+    def _set_pos_(self, i0, i1):
         self.x, self.y, self.ended = i0, i1, False
         self._do_readable_()
 
     def get_next(self):
-        begin_pos = self._getpos_()
+        begin_pos = self._get_pos_()
         ml, ss, f = '', '', True
         str_changed = False
         while f:
@@ -148,15 +148,15 @@ class PasTokenizer():
             self._next_readable_()
         if len(ss)==1:
             ss=ss[0]
-        ss=(ss,begin_pos,self._getpos_(),self.ended)
+        ss=(ss,begin_pos,self._get_pos_(),self.ended)
         self._do_readable_()
         self._skip_spaces_()
         return ss
 
     def read_next(self):
-        i0, i1 = self._getpos_()
+        i0, i1 = self._get_pos_()
         z = self.get_next()
-        self._setpos_(i0, i1)
+        self._set_pos_(i0, i1)
         return z
 
     def is_ended(self):
@@ -196,6 +196,6 @@ class PasTokenizerStack():
     def is_ended(self):
         return self.stack or self.main.is_ended()
 
-class PasTokenizerParallelStack(PasTokenizerStack):
-    def __init__(self,s,comments=True):
-        
+'''class PasTokenizerParallelStack(PasTokenizerStack):
+    def __init__(self,s,comments=True):'''
+
