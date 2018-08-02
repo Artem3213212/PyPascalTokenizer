@@ -27,6 +27,7 @@ class PasTokenizer():
     def __init__(self, s):
         self.s, self.x, self.y, self.ended = s, 0, 0, False
         self._do_readable_()
+        self._skip_spaces_()
 
     def _do_readable_(self):
         if self._is_readable_:
@@ -68,8 +69,11 @@ class PasTokenizer():
     def _getpos_(self):
         return self.x, self.y
 
+    def _setpos_(self, i0, i1):
+        self.x, self.y, self.ended = i0, i1, False
+        self._do_readable_()
+
     def get_next(self):
-        self._skip_spaces_()
         begin_pos = self._getpos_()
         ml, ss, f = '', '', True
         str_changed = False
@@ -141,17 +145,14 @@ class PasTokenizer():
             ss=ss[0]
         ss=(ss,begin_pos,self._getpos_(),self.ended)
         self._do_readable_()
+        self._skip_spaces_()
         return ss
 
     def read_next(self):
         i0, i1 = self._getpos_()
         z = self.get_next()
-        self.setpos(i0, i1)
+        self._setpos_(i0, i1)
         return z
-
-    def setpos(self, i0, i1):
-        self.x, self.y, self.ended = i0, i1, False
-        self._do_readable_()
 
     def is_ended(self):
         return self.ended
@@ -173,6 +174,9 @@ class PasTokenizerStack():
         while is_comment(s[1]):
             return self.main
 
+    def push(self, s):
+        self.stack.append(s)
+
     def pop(self):
         if self.stack:
             return self.stack.pop()
@@ -186,7 +190,4 @@ class PasTokenizerStack():
 
     def is_ended(self):
         return self.stack or self.main.is_ended()
-
-    def push(self, s):
-        self.stack.append(s)
 
