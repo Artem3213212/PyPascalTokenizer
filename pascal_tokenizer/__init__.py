@@ -20,6 +20,9 @@ def is_name(s):
             return False
     return True
 
+def is_string(s):
+    return s[0]=="'" and s[-1]=="'"
+
 class PasTokenizer():
     def __init__(self, s):
         self.s, self.x, self.y, self.ended = s, 0, 0, False
