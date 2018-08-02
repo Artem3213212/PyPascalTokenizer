@@ -8,15 +8,17 @@ SYMS1 = ['(',')','[',']','/','|','\\','@','#','=','>','<',':',';',',','.','$','+
 SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*=']
 SPACES = ['\f','\n','\r','\t','\v',' ']
 NO_NAME_SYMS = SYMS1 + SPACES + ['{','}']
+CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
+CHARS_ID = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
 
 def is_comment(s):
     return (s[0]=='{' and s[-1]=='}') or (s[:2]=='(*' and s[-2:]=='*)') or s[:2]=='//'
 
 def is_name(s):
-    if not (s[0] in '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'):
+    if not (s[0] in CHARS_ID0):
         return False
     for i in s[1:]:
-        if not (i in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'):
+        if not (i in CHARS_ID):
             return False
     return True
 
