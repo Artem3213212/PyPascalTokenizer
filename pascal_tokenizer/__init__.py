@@ -31,11 +31,11 @@ def is_string(s):
 class PasTokenizer():
     def __init__(self, s):
         self.s, self.y, self.x, self.ended = s, 0, 0, False
-        self._do_readable_()
-        self._skip_spaces_()
+        self._do_readable()
+        self._skip_spaces()
 
-    def _do_readable_(self):
-        if self._is_readable_:
+    def _do_readable(self):
+        if self._is_readable:
             if self.y+1 == len(self.s):
                 self.ended = True
             else:
@@ -47,12 +47,12 @@ class PasTokenizer():
                         break
                     self.y+=1
 
-    def _is_readable_(self):
+    def _is_readable(self):
         return len(self.s[self.y])<=self.x
 
-    def _next_readable_(self):
+    def _next_readable(self):
         self.x=+1
-        if self._is_readable_():
+        if self._is_readable():
             if self.y+1 == len(self.s):
                 self.ended = True
             else:
@@ -67,19 +67,19 @@ class PasTokenizer():
         else:
             return False
 
-    def _skip_spaces_(self):
+    def _skip_spaces(self):
         while self.s[self.y][self.x] in SPACES:
-            self._next_readable_()
+            self._next_readable()
 
-    def _get_pos_(self):
+    def _get_pos(self):
         return self.y, self.x
 
-    def _set_pos_(self, i0, i1):
+    def _set_pos(self, i0, i1):
         self.y, self.x, self.ended = i0, i1, False
-        self._do_readable_()
+        self._do_readable()
 
     def get_next(self):
-        begin_pos = self._get_pos_()
+        begin_pos = self._get_pos()
         ml, ss, f = '', '', True
         str_changed = False
         while f:
@@ -124,7 +124,7 @@ class PasTokenizer():
                             ss = ss + next_sym
                             while line[self.x]!="'":
                                 self.x+=1
-                                if not self._is_readable_():
+                                if not self._is_readable():
                                     break
                                 ss = ss + line[self.x]
                         break
@@ -132,7 +132,7 @@ class PasTokenizer():
                         while not(line[self.x] in NO_NAME_SYMS):
                             ss=ss+line[self.x]
                             self.x+=1
-                            if not self._is_readable_():
+                            if not self._is_readable():
                                 break
                         break
             else:
@@ -145,18 +145,18 @@ class PasTokenizer():
                     elif self.x!=0:
                         if line[self.x-1]=='*':
                             ml=''
-            self._next_readable_()
+            self._next_readable()
         if len(ss)==1:
             ss=ss[0]
-        ss=(ss,begin_pos,self._get_pos_(),self.ended)
-        self._do_readable_()
-        self._skip_spaces_()
+        ss=(ss,begin_pos,self._get_pos(),self.ended)
+        self._do_readable()
+        self._skip_spaces()
         return ss
 
     def read_next(self):
-        i0, i1 = self._get_pos_()
+        i0, i1 = self._get_pos()
         z = self.get_next()
-        self._set_pos_(i0, i1)
+        self._set_pos(i0, i1)
         return z
 
     def is_ended(self):
@@ -167,14 +167,14 @@ class PasTokenizerStack():
         self.main = PasTokenizer(s)
         self.stack = []
         if comments:
-            self._pop_ = self._get_with_comments_
+            self._pop_ = self._get_with_comments
         else:
-            self._pop_ = self._get_without_comments_
+            self._pop_ = self._get_without_comments
 
-    def _get_with_comments_(self):
+    def _get_with_comments(self):
         return self.main.get_next()
 
-    def _get_without_comments_(self):
+    def _get_without_comments(self):
         s=(0,'//')
         while is_comment(s[1]):
             s = self.main.
