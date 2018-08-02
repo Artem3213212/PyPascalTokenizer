@@ -16,16 +16,16 @@ Token is saved as 4-tuple (text, begin, end, final):
 * end: position after token end, tuple (y, x)
 * final: bool, True if it was last token
 
-Class PasTokenizer methods
---------------------------
+Class PasTokenizer
+------------------
 
 * __init__(lines): param of constructor is list of strings with Pascal code
 * get_next(): get next token and change end pos
 * read_next(): get next token, but don't change end pos
 * is_ended(): check if text ended
 
-Class PasTokenizerStack methods
--------------------------------
+Class PasTokenizerStack
+-----------------------
 
 * __init__(lines) - param of constructor is list of strings with Pascal code
 * push(s): push token to stack
@@ -33,30 +33,19 @@ Class PasTokenizerStack methods
 * read_last(): read (get but don't delete) top token from stack
 * is_ended(): check if stack ended
 
-PasTokenizerStack
------------------
+Class PasTokenizerParallelStack
+-------------------------------
 
-Class PasTokenizerStack has constructor, which needs param: list of source code lines. It has methods:
-
-* __init__(s) - Create class, get list of strings what was tokenized
-* push(s) - push token to stack
-* pop() - pop token from stack
-* read_last() - read top token in stack
-* is_ended() - check if stack ended
-
-PasTokenizerParallelStack
--------------------------
-
-Parrallel version of PasTokenizerStack.
+Descendant of PasTokenizerStack, which uses thread(s) for parsing entire file.
 
 Utils
 -----
 
-Some functions to analise tokens.
+Helper functions to analyze token text.
 
-* is_comment(s) Check token's text. True if comment.
-* is_name(s) Check token's text. True if it can be name (Not check reserved words).
-* is_string(s) Check token's text. True if string.
+* is_name(s): Check for valid identifier (can be reserved word too).
+* is_comment(s): Check for valid comment.
+* is_string(s): Check for string constant.
 
 
 Author
