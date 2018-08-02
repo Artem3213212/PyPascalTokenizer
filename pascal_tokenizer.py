@@ -3,14 +3,24 @@ SYMS2 = ['>=','<=','<>',':=','..']
 SPACES = ['\f','\n','\r','\t','\v',' ']
 NO_NAME_SYMS = SYMS1 + SPACES + ['{','}']
 
+def is_comment(s):
+    return (s[0]=='{' and s[-1]=='}') or (s[:2]=='(*' and s[-2:]=='*)') or s[:2]=='//'
+
+def is_name(s):
+    if not(s[0] in '&abcdefghijklmnopqrstuvwxyz_'):
+        return False
+    for i in s[1:].lower():
+        if not (i in 'abcdefghijklmnopqrstuvwxyz0123456789_'):
+            return False
+    return True
+
 class PasTokenizer():
     def __init__(self, s):
         self.s, self.i0, self.i1, self.ended = s, 0, 0, False
-        self.__do_readable__()
-        self.last_data = ('',self.getpos(),self.getpos(),self.ended)
+        self._do_readable_()
 
-    def __do_readable__(self):
-        if self.__is_readable__:
+    def _do_readable_(self):
+        if self._is_readable_:
             if self.i0+1 == len(self.s):
                 self.ended = True
             else:
@@ -22,12 +32,12 @@ class PasTokenizer():
                         break
                     self.i0+=1
 
-    def __is_readable__(self):
+    def _is_readable_(self):
         return len(self.s[self.i0])<=self.i1
 
-    def __next_readable__(self):
+    def _next_readable_(self):
         self.i1=+1
-        if self.__is_readable__():
+        if self._is_readable_():
             if self.i0+1 == len(self.s):
                 self.ended = True
             else:
@@ -42,13 +52,16 @@ class PasTokenizer():
         else:
             return False
 
-    def __skip_spaces__(self):
+    def _skip_spaces_(self):
         while self.s[self.i0][self.i1] in SPACES:
-            self.__next_readable__()
+            self._next_readable_()
+
+    def _getpos_(self):
+        return self.i0, self.i1
 
     def get_next(self):
-        self.__skip_spaces__()
-        begin_pos = self.getpos()
+        self._skip_spaces_()
+        begin_pos = self._getpos_()
         ml, ss, f = '', '', True
         str_changed = False
         while f:
@@ -93,7 +106,7 @@ class PasTokenizer():
                             ss = ss + next_sym
                             while line[self.i1]!="'":
                                 self.i1+=1
-                                if not self.__is_readable__():
+                                if not self._is_readable_():
                                     break
                                 ss = ss + line[self.i1]
                         break
@@ -101,7 +114,7 @@ class PasTokenizer():
                         while not(line[self.i1] in NO_NAME_SYMS):
                             ss=ss+line[self.i1]
                             self.i1+=1
-                            if not self.__is_readable__():
+                            if not self._is_readable_():
                                 break
                         break
             else:
@@ -114,28 +127,56 @@ class PasTokenizer():
                     elif self.i1!=0:
                         if line[self.i1-1]=='*':
                             ml=''
-            self.__next_readable__()
+            self._next_readable_()
         if len(ss)==1:
             ss=ss[0]
-        self.last_data=(ss,begin_pos,self.getpos(),self.ended)
-        self.__do_readable__()
+        ss=(ss,begin_pos,self._getpos_(),self.ended)
+        self._do_readable_()
         return ss
 
     def read_next(self):
-        i0, i1 = self.getpos()
+        i0, i1 = self._getpos_()
         z = self.get_next()
         self.setpos(i0, i1)
         return z
 
-    def getpos(self):
-        return self.i0, self.i1
-
     def setpos(self, i0, i1):
         self.i0, self.i1, self.ended = i0, i1, False
-        self.__do_readable__()
+        self._do_readable_()
 
     def is_ended(self):
         return self.ended
 
-    def get_last_data(self):
-        return self.last_data
+class PasTokenizerStack():
+    def __init__(self, s, comments=True):
+        self.main = PasTokenizer(s)
+        self.stack = []
+        if comments:
+            self._pop_ = self._get_with_comments_
+        else:
+            self._pop_ = self._get_without_comments_
+
+    def _get_with_comments_(self):
+        return self.main.get_next()
+
+    def _get_without_comments_(self):
+        s=(0,'//')
+        while is_comment(s[1]):
+            return self.main
+
+    def pop(self):
+        if self.stack:
+            return self.stack.pop()
+        else:
+            return self._pop_()
+
+    def read_last(self):
+        if not self.stack:
+            self.stack.append(self._pop_())
+        return self.stack[-1]
+
+    def is_ended(self):
+        return self.stack or self.main.is_ended()
+
+    def push(self, s):
+        self.stack.append(s)
