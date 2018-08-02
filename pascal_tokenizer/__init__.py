@@ -22,48 +22,48 @@ def is_name(s):
 
 class PasTokenizer():
     def __init__(self, s):
-        self.s, self.i0, self.i1, self.ended = s, 0, 0, False
+        self.s, self.x, self.y, self.ended = s, 0, 0, False
         self._do_readable_()
 
     def _do_readable_(self):
         if self._is_readable_:
-            if self.i0+1 == len(self.s):
+            if self.x+1 == len(self.s):
                 self.ended = True
             else:
-                self.i0+=1
-                self.i1=0
-                while not self.s[self.i0]:
-                    if self.i0+1 == len(self.s):
+                self.x+=1
+                self.y=0
+                while not self.s[self.x]:
+                    if self.x+1 == len(self.s):
                         self.ended = True
                         break
-                    self.i0+=1
+                    self.x+=1
 
     def _is_readable_(self):
-        return len(self.s[self.i0])<=self.i1
+        return len(self.s[self.x])<=self.y
 
     def _next_readable_(self):
-        self.i1=+1
+        self.y=+1
         if self._is_readable_():
-            if self.i0+1 == len(self.s):
+            if self.x+1 == len(self.s):
                 self.ended = True
             else:
-                self.i0+=1
-                self.i1=0
-                while not self.s[self.i0]:
-                    if self.i0+1 == len(self.s):
+                self.x+=1
+                self.y=0
+                while not self.s[self.x]:
+                    if self.x+1 == len(self.s):
                         self.ended = True
                         break
-                    self.i0+=1
+                    self.x+=1
             return True
         else:
             return False
 
     def _skip_spaces_(self):
-        while self.s[self.i0][self.i1] in SPACES:
+        while self.s[self.x][self.y] in SPACES:
             self._next_readable_()
 
     def _getpos_(self):
-        return self.i0, self.i1
+        return self.x, self.y
 
     def get_next(self):
         self._skip_spaces_()
@@ -71,67 +71,67 @@ class PasTokenizer():
         ml, ss, f = '', '', True
         str_changed = False
         while f:
-            line = self.s[self.i0]
-            now_sym = line[self.i1]
+            line = self.s[self.x]
+            now_sym = line[self.y]
             l = len(line)
-            if self.i1+1 != l:
-                next_sym = line[self.i1+1]
+            if self.y+1 != l:
+                next_sym = line[self.y+1]
             else:
                 next_sym = ''
             if ml == '':
                 if now_sym == '/':
                     if next_sym == '/':
-                        ss = line[self.i1:]
-                        self.i1 = l
+                        ss = line[self.y:]
+                        self.y = l
                         break
                 elif now_sym == '{':
                     ml = '}'
                     ss=[str_changed]
-                    last_i0 = self.i0
+                    last_i0 = self.x
                 elif now_sym == '(':
                     if next_sym == '*':
                         ml = ')'
-                        self.i1+=1
-                        last_i0 = self.i0
+                        self.y+=1
+                        last_i0 = self.x
                         ss = [now_sym+next_sym]
                     else:
                         ss = '('
-                        self.i1+=1
+                        self.y+=1
                         break
                 else:
                     if now_sym in SYMS1:
                         ss = now_sym
                         if now_sym + next_sym in SYMS2:
-                            self.i1+=2
+                            self.y+=2
                             ss = ss + next_sym
                         break
                     elif now_sym=="'":
                         ss="'"
-                        self.i1+=1
+                        self.y+=1
                         if next_sym!='':
                             ss = ss + next_sym
-                            while line[self.i1]!="'":
-                                self.i1+=1
+                            while line[self.y]!="'":
+                                self.y+=1
                                 if not self._is_readable_():
                                     break
-                                ss = ss + line[self.i1]
+                                ss = ss + line[self.y]
                         break
                     else:
-                        while not(line[self.i1] in NO_NAME_SYMS):
-                            ss=ss+line[self.i1]
-                            self.i1+=1
+                        while not(line[self.y] in NO_NAME_SYMS):
+                            ss=ss+line[self.y]
+                            self.y+=1
                             if not self._is_readable_():
                                 break
                         break
             else:
-                while last_i0!=self.i0:
+                while last_i0!=self.x:
                     ss.append('')
                 ss[-1] = ss[-1] + now_sym
                 if now_sym==ml:
                     if ml=='}':
                         ml=''
-                    elif self.i1!=0:
-                        if line[self.i1-1]=='*':
+                    elif self.y!=0:
+                        if line[self.y-1]=='*':
                             ml=''
             self._next_readable_()
         if len(ss)==1:
@@ -147,7 +147,7 @@ class PasTokenizer():
         return z
 
     def setpos(self, i0, i1):
-        self.i0, self.i1, self.ended = i0, i1, False
+        self.x, self.y, self.ended = i0, i1, False
         self._do_readable_()
 
     def is_ended(self):
