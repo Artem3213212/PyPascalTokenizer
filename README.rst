@@ -6,44 +6,32 @@ Module for Python 3. It does tokenizing of Pascal code (it's planned to support 
 API
 ===
 
-Token format:
--------------
+Token struct
+------------
 
-It is tuple with 4 elements:
+Token is saved as 4-tuple (text, begin, end, final):
 
-* token - string with token text
+* text: string with token text
+* begin: position of token start, tuple (y, x), where y - 0-based line index and x - 0-based character index in line
+* end: position after token end, tuple (y, x)
+* final: bool, True if it was last token
 
-* begin - tuple with line and symbol (start from 0) where token begin(first symbol)
+Class PasTokenizer methods
+--------------------------
 
-* end - tuple with line and symbol (start from 0) where token end(first no token symbol)(if token end when line end
-symbol num = line len)
+* __init__(lines): param of constructor is list of strings with Pascal code
+* get_next(): get next token and change end pos
+* read_next(): get next token, but don't change end pos
+* is_ended(): check if text ended
 
-* ended - True if it was last token
-
-Class PasTokenizer has constructor, which needs param: list of source code lines. It has methods:
-
-* __init__(s) - Create class, get list of strings what was tokenized
-
-* get_next() - get next token and save end pos
-
-* read_next() - get next token, but not save end pos
-
-* is_ended() - check if text ended
-
-Class PasTokenizerStack has constructor, which needs param: list of source code lines. It has methods:
-
-* __init__(s) - Create class, get list of strings what was tokenized
-
-* push(s) - push token to stack
-
-* pop() - pop token from stack
-
-* read_last() - read top token in stack
-
-* is_ended() - check if stack ended
-
-
-
+Class PasTokenizerStack methods
+-------------------------------
+ 
+* __init__(lines) - param of constructor is list of strings with Pascal code
+* push(s): push token to stack
+* pop(): pop (get and delete) token from stack 
+* read_last(): read (get but don't delete) top token from stack
+* is_ended(): check if stack ended
 
 Author
 =====
