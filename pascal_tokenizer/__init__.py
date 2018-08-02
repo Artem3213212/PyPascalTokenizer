@@ -13,10 +13,10 @@ def is_comment(s):
     return (s[0]=='{' and s[-1]=='}') or (s[:2]=='(*' and s[-2:]=='*)') or s[:2]=='//'
 
 def is_name(s):
-    if not(s[0] in '&abcdefghijklmnopqrstuvwxyz_'):
+    if not (s[0] in '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'):
         return False
-    for i in s[1:].lower():
-        if not (i in 'abcdefghijklmnopqrstuvwxyz0123456789_'):
+    for i in s[1:]:
+        if not (i in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'):
             return False
     return True
 
