@@ -19,7 +19,7 @@ Token is saved as 4-tuple (text, begin, end, final):
 Class PasTokenizer
 ------------------
 
-* __init__(lines): param of constructor is list of strings with Pascal code
+* __init__(lines): params: list of source code strings
 * get_next(): get next token and change end pos
 * read_next(): get next token, but don't change end pos
 * is_ended(): check if text ended
@@ -27,7 +27,7 @@ Class PasTokenizer
 Class PasTokenizerStack
 -----------------------
 
-* __init__(lines) - param of constructor is list of strings with Pascal code
+* __init__(lines, comments=True): params: list of source code strings; "comments" allows to get also comment-tokens (otherwise tokenizer skips them)
 * push(s): push token to stack
 * pop(): pop (get and delete) token from stack
 * read_last(): read (get but don't delete) top token from stack
@@ -36,7 +36,9 @@ Class PasTokenizerStack
 Class PasTokenizerParallelStack
 -------------------------------
 
-Descendant of PasTokenizerStack, which uses thread(s) for parsing entire file. Before destroy it you mast call stop().
+Descendant of PasTokenizerStack, which uses thread(s) for parsing entire file. Before destroying it you mast call stop().
+
+* __init__(lines, comments=True, qlong=1000): additonal param: size of internal queue buffer
 
 Utils
 -----
