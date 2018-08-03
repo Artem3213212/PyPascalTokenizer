@@ -4,6 +4,8 @@
 # License: MPL 2.0
 #
 
+import queue
+
 SYMS1 = ['(',')','[',']','/','|','\\','@','#','=','>','<',':',';',',','.','$','+','-','*']
 SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*=']
 SPACES = ['\f','\n','\r','\t','\v',' ']
@@ -167,18 +169,18 @@ class PasTokenizerStack():
         self.main = PasTokenizer(s)
         self.stack = []
         if comments:
-            self._pop_ = self._get_with_comments
+            self._pop = self._get_with_comments
         else:
-            self._pop_ = self._get_without_comments
+            self._pop = self._get_without_comments
 
     def _get_with_comments(self):
         return self.main.get_next()
 
     def _get_without_comments(self):
-        s = (0,'//')
-        while is_comment(s[1]):
+        while True:
             s = self.main.get_next()
-        return s
+            if not is_comment(s[1]):
+                return s
 
     def push(self, s):
         self.stack.append(s)
@@ -187,16 +189,44 @@ class PasTokenizerStack():
         if self.stack:
             return self.stack.pop()
         else:
-            return self._pop_()
+            return self._pop()
 
     def read_last(self):
         if not self.stack:
-            self.stack.append(self._pop_())
+            self.stack.append(self._pop())
         return self.stack[-1]
 
     def is_ended(self):
-        return self.stack or self.main.is_ended()
+        return self.stack and self.main.is_ended()
 
-'''class PasTokenizerParallelStack(PasTokenizerStack):
-    def __init__(self,s,comments=True):'''
+class PasTokenizerParallelStack(PasTokenizerStack):
+    def __init__(self, s, comments = True, qlong = 1000):
+        super(PasTokenizerParallelStack,self).__init__(s, comments)
+        self.queue = queue.Queue(qlong)
+        self._work()
+        self.stop = False
 
+    def _get_with_comments(self):
+        s = self.queue.get()
+        self.queue.task_done()
+        return s
+
+    def _get_without_comments(self):
+        while True:
+            s = self.queue.get()
+            self.queue.task_done()
+            if not is_comment(s[1]):
+                return s
+
+    async def _work(self):
+        while not self.main.is_ended():
+            self.queue.put(self.main.get_next())
+            if self.stop:
+                return
+
+    def is_ended(self):
+        return self.stack and self.main.is_ended() and self.queue.empty()
+
+    def stop(self):
+        self.main.ended = True
+        self.queue.task_done()

@@ -36,7 +36,7 @@ Class PasTokenizerStack
 Class PasTokenizerParallelStack
 -------------------------------
 
-Descendant of PasTokenizerStack, which uses thread(s) for parsing entire file.
+Descendant of PasTokenizerStack, which uses thread(s) for parsing entire file. Before destroy it you mast call stop().
 
 Utils
 -----
