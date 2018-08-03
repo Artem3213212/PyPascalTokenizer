@@ -20,6 +20,10 @@ def is_comment(s):
         return s.startswith('{') or s.startswith('(*') or s.startswith('//')
 
 def is_name(s):
+    if len(s)<=0:
+        return False
+    if s=='&':
+        return False
     if not (s[0] in CHARS_ID0):
         return False
     for i in s[1:]:
