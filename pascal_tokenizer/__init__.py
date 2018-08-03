@@ -179,7 +179,7 @@ class PasTokenizerStack():
     def _get_without_comments(self):
         while True:
             s = self.main.get_next()
-            if not is_comment(s[1]):
+            if not is_comment(s[0]):
                 return s
 
     def push(self, s):
@@ -215,7 +215,7 @@ class PasTokenizerParallelStack(PasTokenizerStack):
         while True:
             s = self.queue.get()
             self.queue.task_done()
-            if not is_comment(s[1]):
+            if not is_comment(s[0]):
                 return s
 
     async def _work(self):
