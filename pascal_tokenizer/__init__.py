@@ -4,7 +4,7 @@
 # License: MPL 2.0
 #
 
-import queue
+import queue, threading
 
 SYMS1 = ['(',')','[',']','/','|','\\','@','#','=','>','<',':',';',',','.','$','+','-','*']
 SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*=']
@@ -33,28 +33,10 @@ def is_string(s):
 class PasTokenizer():
     def __init__(self, s):
         self.s, self.y, self.x, self.ended = s, 0, 0, False
-        self._do_readable()
         self._skip_spaces()
 
     def _do_readable(self):
-        if self._is_readable:
-            if self.y+1 == len(self.s):
-                self.ended = True
-            else:
-                self.y+=1
-                self.x=0
-                while not self.s[self.y]:
-                    if self.y+1 == len(self.s):
-                        self.ended = True
-                        break
-                    self.y+=1
-
-    def _is_readable(self):
-        return len(self.s[self.y])<=self.x
-
-    def _next_readable(self):
-        self.x=+1
-        if self._is_readable():
+        if not self._is_readable():
             if self.y+1 == len(self.s):
                 self.ended = True
             else:
@@ -69,9 +51,18 @@ class PasTokenizer():
         else:
             return False
 
+    def _is_readable(self):
+        return len(self.s[self.y])>self.x
+
+    def _next_readable(self):
+        self.x+=1
+        return self._do_readable()
+
     def _skip_spaces(self):
-        while self.s[self.y][self.x] in SPACES:
-            self._next_readable()
+        self._do_readable()
+        if not self.ended:
+            while self.s[self.y][self.x] in SPACES:
+                self._next_readable()
 
     def _get_pos(self):
         return self.y, self.x
@@ -84,7 +75,7 @@ class PasTokenizer():
         begin_pos = self._get_pos()
         ml, ss, f = '', '', True
         str_changed = False
-        while f:
+        while f and not self.ended:
             line = self.s[self.y]
             now_sym = line[self.x]
             l = len(line)
@@ -100,7 +91,7 @@ class PasTokenizer():
                         break
                 elif now_sym == '{':
                     ml = '}'
-                    ss=[str_changed]
+                    ss=[now_sym]
                     last_i0 = self.y
                 elif now_sym == '(':
                     if next_sym == '*':
@@ -115,8 +106,9 @@ class PasTokenizer():
                 else:
                     if now_sym in SYMS1:
                         ss = now_sym
+                        self.x+=1
                         if now_sym + next_sym in SYMS2:
-                            self.x+=2
+                            self.x+=1
                             ss = ss + next_sym
                         break
                     elif now_sym=="'":
@@ -140,19 +132,25 @@ class PasTokenizer():
             else:
                 while last_i0!=self.y:
                     ss.append('')
+                    last_i0+=1
+                #print(self.x,ss)
                 ss[-1] = ss[-1] + now_sym
                 if now_sym==ml:
                     if ml=='}':
-                        ml=''
+                        self.x+=1
+                        break
                     elif self.x!=0:
                         if line[self.x-1]=='*':
-                            ml=''
+                            self.x+=1
+                            break
             self._next_readable()
         if len(ss)==1:
             ss=ss[0]
+        if ss=='//Устанавливаем высоту заднего буфера':
+            print('ff')
         ss=(ss,begin_pos,self._get_pos(),self.ended)
-        self._do_readable()
         self._skip_spaces()
+        print(ss)
         return ss
 
     def read_next(self):
@@ -203,8 +201,8 @@ class PasTokenizerParallelStack(PasTokenizerStack):
     def __init__(self, s, comments = True, qlong = 1000):
         super(PasTokenizerParallelStack,self).__init__(s, comments)
         self.queue = queue.Queue(qlong)
-        self._work()
-        self.stop = False
+        th = threading.Thread(target = self._work, args = (self,))
+        th.start()
 
     def _get_with_comments(self):
         s = self.queue.get()
@@ -218,11 +216,9 @@ class PasTokenizerParallelStack(PasTokenizerStack):
             if not is_comment(s[0]):
                 return s
 
-    async def _work(self):
+    def _work(self,s):
         while not self.main.is_ended():
             self.queue.put(self.main.get_next())
-            if self.stop:
-                return
 
     def is_ended(self):
         return self.stack and self.main.is_ended() and self.queue.empty()
