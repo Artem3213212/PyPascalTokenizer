@@ -28,7 +28,7 @@ def is_name(s):
     return True
 
 def is_string(s):
-    return s[0]=="'" and s[-1]=="'"
+    return s.startswith("'")
 
 class PasTokenizer():
     def __init__(self, s):
