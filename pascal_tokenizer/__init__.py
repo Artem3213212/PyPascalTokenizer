@@ -133,7 +133,6 @@ class PasTokenizer():
                 while last_i0!=self.y:
                     ss.append('')
                     last_i0+=1
-                #print(self.x,ss)
                 ss[-1] = ss[-1] + now_sym
                 if now_sym==ml:
                     if ml=='}':
@@ -146,11 +145,8 @@ class PasTokenizer():
             self._next_readable()
         if len(ss)==1:
             ss=ss[0]
-        if ss=='//Устанавливаем высоту заднего буфера':
-            print('ff')
         ss=(ss,begin_pos,self._get_pos(),self.ended)
         self._skip_spaces()
-        print(ss)
         return ss
 
     def read_next(self):
