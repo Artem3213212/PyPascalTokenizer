@@ -179,6 +179,8 @@ class PasTokenizerStack():
             s = self.main.get_next()
             if not is_comment(s[0]):
                 return s
+            if s[3]:
+                return ('',(0,0),(0,0),True)
 
     def push(self, s):
         self.stack.append(s)
@@ -215,6 +217,8 @@ class PasTokenizerParallelStack(PasTokenizerStack):
             self.queue.task_done()
             if not is_comment(s[0]):
                 return s
+            if s[3]:
+                return ('',(0,0),(0,0),True)
 
     def _work(self,s):
         while not self.main.is_ended():
