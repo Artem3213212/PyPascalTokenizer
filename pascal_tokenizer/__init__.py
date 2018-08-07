@@ -210,13 +210,11 @@ class PasTokenizerParallelStack(PasTokenizerStack):
 
     def _get_with_comments(self):
         s = self.queue.get()
-        self.queue.task_done()
         return s
 
     def _get_without_comments(self):
         while True:
             s = self.queue.get()
-            self.queue.task_done()
             if not is_comment(s[0]):
                 return s
             if s[3]:
@@ -225,6 +223,7 @@ class PasTokenizerParallelStack(PasTokenizerStack):
     def _work(self,s):
         while not self.main.is_ended():
             self.queue.put(self.main.get_next())
+        self.queue.put(tuple(['',(0,0),(0,0),True]))
 
     def is_ended(self):
         return self.stack and self.main.is_ended()and self.queue.empty()
