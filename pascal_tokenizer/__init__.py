@@ -123,8 +123,10 @@ class PasTokenizer():
                             while line[self.x]!="'":
                                 self.x+=1
                                 if not self._is_readable():
+                                    self.x-=1
                                     break
                                 ss = ss + line[self.x]
+                            self.x+=1
                         break
                     else:
                         while not(line[self.x] in NO_NAME_SYMS):
@@ -225,7 +227,7 @@ class PasTokenizerParallelStack(PasTokenizerStack):
             self.queue.put(self.main.get_next())
 
     def is_ended(self):
-        return self.stack and self.main.is_ended() and self.queue.empty()
+        return self.stack and self.main.is_ended()and self.queue.empty()
 
     def stop(self):
         self.main.ended = True
