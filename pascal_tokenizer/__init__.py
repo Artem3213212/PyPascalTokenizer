@@ -67,6 +67,8 @@ class PasTokenizer():
         if not self.ended:
             while self.s[self.y][self.x] in SPACES:
                 self._next_readable()
+                if self.ended:
+                    break
 
     def _get_pos(self):
         return self.y, self.x
