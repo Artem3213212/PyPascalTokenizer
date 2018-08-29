@@ -230,4 +230,5 @@ class PasTokenizerParallelStack(PasTokenizerStack):
 
     def stop(self):
         self.main.ended = True
-        self.queue.task_done()
+        while not self.queue.get_nowait()[3]:
+            pass
