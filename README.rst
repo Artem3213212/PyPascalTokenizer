@@ -39,6 +39,7 @@ Class PasTokenizerParallelStack
 Descendant of PasTokenizerStack, which uses thread(s) for parsing entire file. Before destroying it you mast call stop().
 
 * __init__(lines, comments=True, qlong=1000): additonal param: size of internal queue buffer
+* stop(): call it before del object
 
 Utils
 -----
