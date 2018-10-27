@@ -10,7 +10,10 @@ SYMS1 = ['(',')','[',']','/','|','\\','@','=','>','<',':',';',',','.','+','-','*
 SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*=','**','><','(.','.)','<<','>>']
 SPACES = ['\f','\n','\r','\t','\v',' ']
 NO_NAME_SYMS = SYMS1 + SPACES + ['{','}']
-CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
+CHARS_ID0 = '&$%abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
+# $ starts hex number
+# % starts binary number
+# & starts escaped name
 CHARS_ID = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
 
 def is_comment(s):
