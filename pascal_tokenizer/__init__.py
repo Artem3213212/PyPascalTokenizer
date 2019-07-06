@@ -6,8 +6,8 @@
 
 import queue, threading
 
-SYMS1 = ['(',')','[',']','/','|','\\','@','=','>','<',':',';',',','.','+','-','*','^']
-SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*=','**','><','(.','.)','<<','>>']
+SYMS1 = ['(',')','[',']','/','|','\\','@','#','=','>','<',':',';',',','.','$','+','-','*']
+SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*=']
 SPACES = ['\f','\n','\r','\t','\v',' ']
 NO_NAME_SYMS = SYMS1 + SPACES + ['{','}']
 CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
@@ -95,6 +95,8 @@ class PasTokenizer():
                         ss = line[self.x:]
                         self.x = l
                         break
+                    else:
+                        ss=['/']
                 elif now_sym == '{':
                     ml = '}'
                     ss=[now_sym]
@@ -154,9 +156,9 @@ class PasTokenizer():
         if len(ss)==1:
             ss=ss[0]
         ss=(ss,begin_pos,self._get_pos(),self.ended)
-        if len(ss[0])==0:
-            raise Exception('Tokenizer error')
         self._skip_spaces()
+        if len(ss[0])==0 and not ss[3]:
+            raise Exception('Tokenizer error')
         return ss
 
     def read_next(self):
