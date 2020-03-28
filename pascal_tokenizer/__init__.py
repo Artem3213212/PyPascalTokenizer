@@ -7,7 +7,7 @@
 import queue, threading
 
 SYMS1 = ['(',')','[',']','/','|','\\','@','#','=','>','<',':',';',',','.','$','+','-','*']
-SYMS2 = ['>=','<=','<>',':=','..','-=','+=','/=','*=']
+SYMS2 = ['>=','<=','<>','><',':=','..','-=','+=','/=','*=']
 SPACES = ['\f','\n','\r','\t','\v',' ']
 NO_NAME_SYMS = SYMS1 + SPACES + ['{','}']
 CHARS_ID0 = '&abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
